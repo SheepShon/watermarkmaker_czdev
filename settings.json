@@ -1,1 +1,6 @@
-[120]
+{
+    "transparent":120,
+    "asp_img_with_kf":1,
+    "asp_img_height_kf":1,
+    "asp_img_indent_kf":1
+}
