@@ -17,7 +17,7 @@ AIHKF = data['asp_img_height_kf'] * 3.4
 AIIKF = data['asp_img_indent_kf'] * 17.14
 
 os.system("cls")
-print(Style.BRIGHT + Fore.BLUE + "czDevelopment "+ Fore.WHITE + "| Watermark maker |" + Fore.YELLOW + " Version 0.5" + Fore.WHITE + "\n")
+print(Style.BRIGHT + Fore.BLUE + "czDevelopment "+ Fore.WHITE + "| Watermark maker |" + Fore.YELLOW + " Version 0.6" + Fore.WHITE + "\n")
 
 def getpos(pos, im_width, im_height, wm_width, wm_height, indent):
     match pos:
