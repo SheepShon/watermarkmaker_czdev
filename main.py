@@ -1,8 +1,12 @@
 from PIL import Image , ImageDraw, ImageFont, ImageFilter
 import os.path
+import os
 import json
 from colorama import Fore, Back, Style
 from colorama import init
+
+os.mkdir("out")
+
 sfile = open("settings.json")
 data = json.load(sfile)
 sfile.close()
