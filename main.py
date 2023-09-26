@@ -1,76 +1,30 @@
 from PIL import Image , ImageDraw, ImageFont, ImageFilter
 import os.path
-import os
 import json
 from colorama import Fore, Back, Style
 from colorama import init
 
-os.mkdir("out")
+data = json.load("settings.json")
 
-sfile = open("settings.json")
-data = json.load(sfile)
-sfile.close()
-
-TRANSPARENT = data['transparent']
-AIWKF = data['asp_img_with_kf'] * 1.76
-AIHKF = data['asp_img_height_kf'] * 3.4
-AIIKF = data['asp_img_indent_kf'] * 17.14
+TRANSPARENT = data[0]
 
 os.system("cls")
-print(Style.BRIGHT + Fore.BLUE + "czDevelopment "+ Fore.WHITE + "| Watermark maker |" + Fore.YELLOW + " Version 0.6" + Fore.WHITE + "\n")
+print(Style.BRIGHT + Fore.BLUE + "czDevelopment "+ Fore.WHITE + "| Watermark maker |" + Fore.YELLOW + " Version 0.5" + Fore.WHITE + "\n")
 
-def getpos(pos, im_width, im_height, wm_width, wm_height, indent):
+def getpos(pos, im_width, im_height, wm_width, wm_height):
     match pos:
         case "lu":
-            xpos = indent
-            ypos = indent
+            xpos = 50
+            ypos = 50
         case "ru":
-            xpos = im_width-indent-wm_width
-            ypos = indent
+            xpos = im_width-50-wm_width
+            ypos = 50
         case "ld":
-            xpos = indent
-            ypos = im_height-indent-wm_height
+            xpos = 50
+            ypos = im_height-50-wm_height
         case "rd":
-            xpos = im_width-indent-wm_width
-            ypos = im_height-indent-wm_height
-        case "cc":
-            xtiw = int(im_width/2)
-            xtww = int(wm_width/2)
-            xpos =  xtiw-xtww
-
-            ytiw = int(im_height/2)
-            ytww = int(wm_height/2)
-            ypos = ytiw-ytww
-
-        case "cu":
-            xtiw = int(im_width/2)
-            xtww = int(wm_width/2)
-            xpos =  xtiw-xtww
-
-            ypos = indent
-
-        case "cd":
-            xtiw = int(im_width/2)
-            xtww = int(wm_width/2)
-            xpos =  xtiw-xtww
-
-            ypos = im_height-indent-wm_height
-
-        case "lc":
-            xpos = indent
-
-            ytiw = int(im_height/2)
-            ytww = int(wm_height/2)
-            ypos = ytiw-ytww
-
-        case "rc":
-            xpos = im_width-indent-wm_width
-
-            ytiw = int(im_height/2)
-            ytww = int(wm_height/2)
-            ypos = ytiw-ytww
-
-            
+            xpos = im_width-50-wm_width
+            ypos = im_height-50-wm_height
     return xpos, ypos
 
 print(Fore.YELLOW +"Режимы работы:"+ Fore.WHITE +"\n1 - Один файл, выбор логотипа и расположения\n2 - Массив файлов, один логотип и расположение для всех одинаковое\n3 - Массив файлов, выбор логотипа и расположения для каждого отдельно\n")
@@ -80,36 +34,25 @@ if mode == "1":
 
     file_name = input(Fore.CYAN +"Название файла [be.jpeg]: "+ Fore.WHITE)
     watermark = input(Fore.CYAN +"Watermark [pm/ym]: "+ Fore.WHITE)
-
-    im = Image.open("ref/"+file_name)
-    im_width, im_height = im.size
-
     if watermark == "pm":
         wm = Image.open("dist/pm.png").convert('RGBA')
-
-        asp_img_with = im_width/AIWKF
-        asp_img_height = asp_img_with/AIHKF
-        indent = im_width/AIIKF
-
-        wm = wm.resize((int(asp_img_with), int(asp_img_height)))
+        wm = wm.resize((500, 160))
     elif watermark == "ym":
         wm = Image.open("dist/ym.png").convert('RGBA')
-
-        asp_img_with = im_width/AIWKF
-        asp_img_height = asp_img_with/AIHKF
-        indent = im_width/AIIKF
-
-        wm = wm.resize((int(asp_img_with), int(asp_img_height)))
+        wm = wm.resize((500, 150))
 
     wm.putalpha(TRANSPARENT)
     wm_width, wm_height = wm.size
 
-    pos = input(Fore.CYAN +"Расположение [cc/lu/ru/cu/ld/rd/cd/lc/rc]\n(c - центр | r - право | l - лево | u - верх | d - низ): "+ Fore.WHITE)
-    xpos,ypos = getpos(pos, im_width, im_height, wm_width, wm_height, int(indent))
+    im = Image.open("ref/"+file_name)
+    im_width, im_height = im.size
+
+    pos = input(Fore.CYAN +"Расположение [lu/ru/ld/rd]: "+ Fore.WHITE)
+    xpos,ypos = getpos(pos, im_width, im_height, wm_width, wm_height)
 
     im.paste(wm, (xpos,ypos),wm)
 
-    im.save("out/"+file_name)
+    im.save("out/wm-"+file_name)
 
     print(Fore.GREEN +'\nУспешно! Watermark добавлен на оригинальное изображение. Новое изображение сохранено под именем\n\n'+ Fore.YELLOW + 'wm-'+file_name)
     print(Fore.WHITE+"\nНажмите любую клавишу для закрытия консоли..")
@@ -118,7 +61,17 @@ if mode == "1":
 elif mode == "2":
 
     watermark = input(Fore.CYAN +"Watermark [pm/ym]: "+ Fore.WHITE)
-    pos = input(Fore.CYAN +"Расположение [cc/lu/ru/cu/ld/rd/cd/lc/rc]\n(c - центр | r - право | l - лево | u - верх | d - низ): "+ Fore.WHITE)
+    if watermark == "pm":
+        wm = Image.open("dist/pm.png").convert('RGBA')
+        wm = wm.resize((500, 160))
+    elif watermark == "ym":
+        wm = Image.open("dist/ym.png").convert('RGBA')
+        wm = wm.resize((500, 150))
+
+    wm.putalpha(TRANSPARENT)
+    wm_width, wm_height = wm.size
+
+    pos = input(Fore.CYAN +"Расположение [lu/ru/ld/rd]: "+ Fore.WHITE)
 
     files = os.listdir("ref")
 
@@ -127,31 +80,9 @@ elif mode == "2":
     for image in files:
         im = Image.open("ref/"+image)
         im_width, im_height = im.size
-
-        if watermark == "pm":
-            wm = Image.open("dist/pm.png").convert('RGBA')
-
-            asp_img_with = im_width/AIWKF
-            asp_img_height = asp_img_with/AIHKF
-            indent = im_width/AIIKF
-
-            wm = wm.resize((int(asp_img_with), int(asp_img_height)))
-
-        elif watermark == "ym":
-            wm = Image.open("dist/ym.png").convert('RGBA')
-
-            asp_img_with = im_width/AIWKF
-            asp_img_height = asp_img_with/AIHKF
-            indent = im_width/AIIKF
-
-            wm = wm.resize((int(asp_img_with), int(asp_img_height)))
-
-        wm.putalpha(TRANSPARENT)
-        wm_width, wm_height = wm.size
-
-        xpos,ypos = getpos(pos, im_width, im_height, wm_width, wm_height, int(indent))
+        xpos,ypos = getpos(pos, im_width, im_height, wm_width, wm_height)
         im.paste(wm, (xpos,ypos),wm)
-        im.save("out/"+image)
+        im.save("out/wm-"+image)
         saved_files.append("wm-"+image)
 
     print(Fore.GREEN +'\nУспешно! Watermark добавлен на массив изображений.\nСписок обработнных файлов:\n'+ Fore.YELLOW)
@@ -173,32 +104,22 @@ elif mode == "3":
         print("\nПосле ознакомления с изображением, нажмите Enter в консоли.")
         im.show()
         watermark = input(Fore.CYAN +"Watermark [pm/ym]: "+ Fore.WHITE)
-        
         if watermark == "pm":
             wm = Image.open("dist/pm.png").convert('RGBA')
-
-            asp_img_with = im_width/AIWKF
-            asp_img_height = asp_img_with/AIHKF
-            indent = im_width/AIIKF
-
-            wm = wm.resize((int(asp_img_with), int(asp_img_height)))
+            wm = wm.resize((500, 160))
         elif watermark == "ym":
             wm = Image.open("dist/ym.png").convert('RGBA')
-
-            asp_img_with = im_width/AIWKF
-            asp_img_height = asp_img_with/AIHKF
-            indent = im_width/AIIKF
-
-            wm = wm.resize((int(asp_img_with), int(asp_img_height)))
+            wm = wm.resize((500, 150))
 
         wm.putalpha(TRANSPARENT)
         wm_width, wm_height = wm.size
+        
 
-        pos = input(Fore.CYAN +"Расположение [cc/lu/ru/cu/ld/rd/cd/lc/rc]\n(c - центр | r - право | l - лево | u - верх | d - низ): "+ Fore.WHITE)
+        pos = input(Fore.CYAN +"Расположение [lu/ru/ld/rd]: "+ Fore.WHITE)
 
-        xpos,ypos = getpos(pos, im_width, im_height, wm_width, wm_height, int(indent))
+        xpos,ypos = getpos(pos, im_width, im_height, wm_width, wm_height)
         im.paste(wm, (xpos,ypos),wm)
-        im.save("out/"+image)
+        im.save("out/wm-"+image)
         saved_files.append("wm-"+image)
 
     print(Fore.GREEN +'\nУспешно! Watermark добавлен на массив изображений.\nСписок обработнных файлов:\n'+ Fore.YELLOW)
